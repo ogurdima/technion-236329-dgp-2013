@@ -1,0 +1,28 @@
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenMesh", "OpenMesh\OpenMesh.vcxproj", "{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01-ValenceViewer", "01-ValenceViewer\ValenceViewer.vcxproj", "{FB4BF1C8-6B72-4ED1-A437-8F7EA139831E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD} = {90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}.Debug|Win32.ActiveCfg = Debug|Win32
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}.Debug|Win32.Build.0 = Debug|Win32
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}.Release|Win32.ActiveCfg = Release|Win32
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}.Release|Win32.Build.0 = Release|Win32
+		{FB4BF1C8-6B72-4ED1-A437-8F7EA139831E}.Debug|Win32.ActiveCfg = Debug|Win32
+		{FB4BF1C8-6B72-4ED1-A437-8F7EA139831E}.Debug|Win32.Build.0 = Debug|Win32
+		{FB4BF1C8-6B72-4ED1-A437-8F7EA139831E}.Release|Win32.ActiveCfg = Release|Win32
+		{FB4BF1C8-6B72-4ED1-A437-8F7EA139831E}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

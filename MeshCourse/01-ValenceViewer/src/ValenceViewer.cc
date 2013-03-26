@@ -147,7 +147,7 @@ void
 		}
 		// store this value as a custom property of the vertex
 		mesh_.property(valence_vprop, vit) = valence;
-		// storing maxValence and minValence for O(1) access in future color matching
+		// storing maxValence and minValence for O(1) access for future color coding
 		if ( valence > maxValence ) {
 			maxValence = valence;
 		}
@@ -179,7 +179,7 @@ void
 		int g = (255 - r);
 		// color change is linear on vetex valence: max is red, min is green.
 		// Looks a bit weird on allmost-regular models with a singular high-valence vertex.
-		// Can be fixed using lerp until median valence value but whatever.
+		// Can be fixed using lerp until median valence value but I am too lazy to do it.
 		mesh_.set_color(vit, Mesh::Color(r, g, 0));
 	}
 

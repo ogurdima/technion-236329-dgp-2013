@@ -40,7 +40,7 @@ int main(int argc, char **argv)
 
 	if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
 	{
-
+		exit(1);
 	}
 
 	glutInit(&argc, argv);

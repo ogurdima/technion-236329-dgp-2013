@@ -15,7 +15,9 @@
     <None Include="src\GlutExaminer.hh" />
     <None Include="src\GlutViewer.hh" />
     <None Include="src\MeshViewer.hh" />
-    <None Include="src\ValenceViewer.hh" />
+    <ClInclude Include="src\ValenceViewer.hh">
+      <FileType>Document</FileType>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GlutExaminer.cc" />

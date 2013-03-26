@@ -49,23 +49,24 @@
 //== IMPLEMENTATION ========================================================== 
 
 
-ValenceViewer::
-	ValenceViewer(const char* _title, int _width, int _height)
-	: MeshViewer(_title, _width, _height)
+#define MAX_VALENCE 10000
+
+
+ValenceViewer::ValenceViewer(const char* _title, int _width, int _height) : 
+MeshViewer(_title, _width, _height), 
+maxValence(1),
+minValence(0)
 { 
 	mesh_.request_vertex_colors();
 
 	add_draw_mode("Vertex Valences");
 
-	/*CFileDialog dlg(TRUE,_T(".off"),NULL,NULL,_T("*.off|*.*"));
-	
-	if(dlg.DoModal()==IDOK)
-	{
-		bool ok = true;
-	}
-	*/
-
+	// Add custom menu entries here
 	glutAddMenuEntry("Load Geometry", LOAD_GEOMETRY);
+
+
+	// Adding custom property: 
+	mesh_.add_property(valence_vprop);
 
 }
 
@@ -108,6 +109,9 @@ bool
 	// load mesh
 	if (MeshViewer::open_mesh(_filename))
 	{
+		// reset extreme valence values
+		maxValence = 1;
+		minValence = 0;
 		// compute vertex valence and color coding
 		calc_valences();
 		color_coding();
@@ -130,8 +134,27 @@ void
 	// Compute valence of every vertex of "mesh_" and store them in each vertex
 	// using for example custom attributes via dynamic customization
 	// (hint: use the Mesh::VertexIter iterator)
+	
+	// Dont want to do it, so let's leave it linear as it is now
+	int valenceBucket[MAX_VALENCE] = {};
 
-	// Implement something here
+	// Iterate over all vertices one-by-one
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		int valence = 0;
+		// iterate over 1-ring neighbor vertices, basically just count them
+		for(Mesh::VertexVertexIter vvit = mesh_.vv_iter(vit); vvit; ++vvit) {
+			valence++;
+		}
+		// store this value as a custom property of the vertex
+		mesh_.property(valence_vprop, vit) = valence;
+		// storing maxValence and minValence for O(1) access in future color matching
+		if ( valence > maxValence ) {
+			maxValence = valence;
+		}
+		if ( minValence == 0 || minValence > valence ) {
+			minValence = valence;
+		}
+	}
 
 	/////////////////////////////////////////////////////////////////////////////
 }
@@ -149,7 +172,16 @@ void
 	// veach ertex of "mesh_". 
 	// (hint: use Mesh::Color color type)
 
-	// Implement something here
+	int dValence = maxValence - minValence;
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		int curValence = mesh_.property(valence_vprop, vit);
+		int r = (255 * (curValence - minValence)) / dValence;
+		int g = (255 - r);
+		// color change is linear on vetex valence: max is red, min is green.
+		// Looks a bit weird on allmost-regular models with a singular high-valence vertex.
+		// Can be fixed using lerp until median valence value but whatever.
+		mesh_.set_color(vit, Mesh::Color(r, g, 0));
+	}
 
 	/////////////////////////////////////////////////////////////////////////////
 }

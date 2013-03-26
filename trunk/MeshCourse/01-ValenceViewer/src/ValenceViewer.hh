@@ -79,6 +79,9 @@ protected:
 	void color_coding();
 
 
+	OpenMesh::VPropHandleT<int> valence_vprop;
+	int maxValence;
+	int minValence;
 
 private:
 

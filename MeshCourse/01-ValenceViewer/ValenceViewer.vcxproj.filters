@@ -11,39 +11,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="src\gl.hh">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\GlutExaminer.hh">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\GlutViewer.hh">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="src\MeshViewer.hh">
+    <None Include="src\ValenceViewer.hh">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\GlutExaminer.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\ValenceViewer.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\GlutViewer.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MeshViewer.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\valenceview.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\ValenceViewer.hh">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
 </Project>

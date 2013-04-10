@@ -43,45 +43,41 @@
 //== INCLUDES =================================================================
 
 
-#include "MeshViewer.hh"
+#include <MeshViewer.hh>
+
 
 
 //== CLASS DEFINITION =========================================================
 
-
+	      
 
 class ValenceViewer : public MeshViewer
 {
 public:
+   
+  /// default constructor
+  ValenceViewer(const char* _title, int _width, int _height);
 
-	/// default constructor
-	ValenceViewer(const char* _title, int _width, int _height);
+  // destructor
+  ~ValenceViewer();
 
-	// destructor
-	~ValenceViewer();
-
-	/// open mesh
-	virtual bool open_mesh(const char* _filename);
-	virtual void processmenu(int i);
+  /// open mesh
+  virtual bool open_mesh(const char* _filename);
 
 
-	static const int LOAD_GEOMETRY = 6001;
 
 protected:
 
-	virtual void draw(const std::string& _draw_mode);
+  virtual void draw(const std::string& _draw_mode);
 
 
-	/// calculate vertex valences
-	void calc_valences();
+  /// calculate vertex valences
+  void calc_valences();
 
-	/// set vertex color from vertex valence
-	void color_coding();
+  /// set vertex color from vertex valence
+  void color_coding();
 
 
-	OpenMesh::VPropHandleT<int> valence_vprop;
-	int maxValence;
-	int minValence;
 
 private:
 

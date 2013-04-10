@@ -58,7 +58,7 @@
 #include <iostream>
 #include <string>
 #include <cctype>
-
+#include <functional>
 // OpenMesh
 #include <OpenMesh/Core/System/config.h>
 #include <OpenMesh/Core/IO/Options.hh>

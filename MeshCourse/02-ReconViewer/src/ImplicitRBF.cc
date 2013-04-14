@@ -41,8 +41,7 @@ ImplicitRBF::solve_linear_system( gmmMatrix& _M,
 //-----------------------------------------------------------------------------
 
 
-double 
-ImplicitRBF::operator()(const Vec3f& _p) const
+float ImplicitRBF::operator()(const Vec3f& _p) const
 {
   std::vector<Vec3d>::const_iterator  
     c_it(centers_.begin()),

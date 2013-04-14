@@ -11,12 +11,12 @@
 #include <OpenMesh/Core/Geometry/VectorT.hh>
 #include <vector>
 #include <float.h>
-
+#include "Implicit.h"
 
 //=============================================================================
 
 
-class ImplicitMLS
+class ImplicitMLS : Implicit
 {
 public:
 
@@ -36,6 +36,9 @@ private:
     const std::vector<Vec3f>&  points_;
     const std::vector<Vec3f>&  normals_;
     float                      InvBetaSquare_;
+
+	int getEuclidClosestNeighbor(const int ptidx) const; 
+	float calculateBetha() const;
 };
 
 

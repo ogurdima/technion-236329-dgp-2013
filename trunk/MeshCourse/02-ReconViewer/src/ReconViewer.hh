@@ -49,6 +49,7 @@
 #include "Implicit.h"
 #include <iostream>
 #include <fstream>
+#include "RBF.h"
 
 
 
@@ -62,7 +63,8 @@ typedef OpenMesh::Vec3d                   Vec3d;
 #define MC_RESOLUTION  50
 
 
-	      
+typedef enum {TRIHARMONIC, BSPLINE} ReconRBF; 
+
 
 class ReconViewer : public MeshViewer
 {
@@ -90,6 +92,8 @@ protected:
   virtual void draw(const std::string& _draw_mode);
   std::vector<Point>   Points, Normals;
   float epsilon;
+  float betha;
+  ReconRBF rbf_to_use;
 
 private:
 

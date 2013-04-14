@@ -39,5 +39,8 @@
     <ClInclude Include="src\Implicit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\RBF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

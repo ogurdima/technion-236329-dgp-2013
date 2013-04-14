@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Implicit.h" />
+    <ClInclude Include="src\RBF.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>02-ReconViewer</ProjectName>

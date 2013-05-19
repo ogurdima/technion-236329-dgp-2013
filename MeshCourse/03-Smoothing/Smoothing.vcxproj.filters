@@ -26,5 +26,16 @@
     <ClCompile Include="src\SmoothingViewer.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\UniformLaplacian.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Laplacian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\UniformLaplacian.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

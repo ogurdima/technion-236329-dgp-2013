@@ -36,65 +36,39 @@
 //
 //=============================================================================
 
-
-//== INCLUDES =================================================================
-
 #include "QualityViewer.hh"
 #include <vector>
 #include <float.h>
+#include "UniformLaplacian.h"
 
-
-
-//== IMPLEMENTATION ========================================================== 
-
-
-QualityViewer::
-QualityViewer(const char* _title, int _width, int _height)
-: MeshViewer(_title, _width, _height)
+QualityViewer::QualityViewer(const char* _title, int _width, int _height) : 
+	MeshViewer(_title, _width, _height)
 { 
 	mesh_.request_vertex_colors();
-
-
 	mesh_.add_property(vcurvature_);
 	mesh_.add_property(vunicurvature_);
 	mesh_.add_property(vweight_);
 	mesh_.add_property(eweight_);
 	mesh_.add_property(tshape_);
 	mesh_.add_property(vgausscurvature_);
-	
-
-
 	add_draw_mode("Uniform Mean Curvature");
 	add_draw_mode("Mean Curvature");
 	add_draw_mode("Gaussian Curvature");
 	add_draw_mode("Triangle Shape");
 	add_draw_mode("Reflection Lines");
-
 	init();
 }
 
-
-//-----------------------------------------------------------------------------
-
-
-QualityViewer::
-~QualityViewer()
+QualityViewer::~QualityViewer()
 {
 	if (glIsTexture(textureID_))  
 		glDeleteTextures( 1, &textureID_);
 }
 
-//-----------------------------------------------------------------------------
-
-
-void
-QualityViewer::
-init()
+void QualityViewer::init()
 {
 	// base class first
 	MeshViewer::init();
-
-
 	// generate checkerboard-like image
 	GLubyte tex[256*256*3], *tp=tex;
 	for (int x=0; x<256; ++x)
@@ -128,14 +102,7 @@ init()
 				0, GL_RGB, GL_UNSIGNED_BYTE, tex);
 }
 
-
-
-//-----------------------------------------------------------------------------
-
-
-bool
-QualityViewer::
-open_mesh(const char* _filename)
+bool QualityViewer::open_mesh(const char* _filename)
 {
 	// load mesh
 	if (MeshViewer::open_mesh(_filename))
@@ -147,358 +114,111 @@ open_mesh(const char* _filename)
 		calc_gauss_curvature();
 		calc_triangle_quality();
 		face_color_coding();
-
 		glutPostRedisplay();
 		return true;
 	}
 	return false;
 }
 
-
-//-----------------------------------------------------------------------------
-
-
-
-void
-QualityViewer::
-calc_weights()
+void QualityViewer::calc_weights()
 {
-	Mesh::VertexIter        v_it, v_end(mesh_.vertices_end());
-	Mesh::EdgeIter          e_it, e_end(mesh_.edges_end());
-	Mesh::VertexFaceIter    vf_it;
-	Mesh::FaceVertexIter    fv_it;
-	Mesh::HalfedgeHandle    h0, h1, h2;
-	Mesh::VertexHandle      v0, v1;
-	Mesh::Point             p0, p1, p2, d0, d1;
-	Mesh::Scalar            w, area;
-
-
-
-	for (e_it=mesh_.edges_begin(); e_it!=e_end; ++e_it)
-	{
-		w  = 0.0;
-
-		h0 = mesh_.halfedge_handle(e_it.handle(), 0);
-		v0 = mesh_.to_vertex_handle(h0);
-		p0 = mesh_.point(v0);
-
-		h1 = mesh_.halfedge_handle(e_it.handle(), 1);
-		v1 = mesh_.to_vertex_handle(h1);
-		p1 = mesh_.point(v1);
-
-		h2 = mesh_.next_halfedge_handle(h0);
-		p2 = mesh_.point(mesh_.to_vertex_handle(h2));
-		d0 = (p0 - p2).normalize();
-		d1 = (p1 - p2).normalize();
-		w += 1.0 / tan(acos(std::min(0.99f, std::max(-0.99f, (d0|d1)))));
-
-		h2 = mesh_.next_halfedge_handle(h1);
-		p2 = mesh_.point(mesh_.to_vertex_handle(h2));
-		d0 = (p0 - p2).normalize();
-		d1 = (p1 - p2).normalize();
-		w += 1.0 / tan(acos(std::min(0.99f, std::max(-0.99f, (d0|d1)))));
-
-		w = std::max(0.0f, w);
-		mesh_.property(eweight_,e_it) = w;
-	}
-
-
-	for (v_it=mesh_.vertices_begin(); v_it!=v_end; ++v_it)
-	{
-		area = 0.0;
-
-		for (vf_it=mesh_.vf_iter(v_it); vf_it; ++vf_it)
-		{
-			fv_it = mesh_.fv_iter(vf_it);
- 
-			const Mesh::Point& P = mesh_.point(fv_it);  ++fv_it;
-			const Mesh::Point& Q = mesh_.point(fv_it);  ++fv_it;
-			const Mesh::Point& R = mesh_.point(fv_it);
-
-			area += ((Q-P)%(R-P)).norm() * 0.5f * 0.3333f;
-		}
-
-		mesh_.property(vweight_,v_it) = 1.0 / (2.0 * area);
-	}
+	// ------------- IMPLEMENT HERE ---------
+	// TASK 3.3.a Compute cotangent weights for laplacian, and produce them in the mesh edge property eweight_
+	// Use the weights from calc_weights(): eweight_
+	// ------------- IMPLEMENT HERE ---------
 }
 
-
-//-----------------------------------------------------------------------------
-
-
-void 
-QualityViewer::
-calc_mean_curvature()
+void QualityViewer::calc_mean_curvature()
 {
-	Mesh::VertexIter        v_it, v_end(mesh_.vertices_end());
-	Mesh::HalfedgeHandle    h;
-	Mesh::EdgeHandle        e;
-	Mesh::VertexVertexIter  vv_it;
-  Mesh::VertexOHalfedgeIter  vhe_it;
-	
 	// ------------- IMPLEMENT HERE ---------
 	// TASK 3.3.a Approximate mean curvature using the length of the Laplace-Beltrami approximation
 	// Save your approximation in vcurvature_ vertex property of the mesh.
 	// Use the weights from calc_weights(): eweight_ and vweight_
 	// ------------- IMPLEMENT HERE ---------
-
-  for (v_it=mesh_.vertices_begin(); v_it != v_end; ++v_it)
-  {
-    OpenMesh::Vec3f         laplace(0.0, 0.0, 0.0);
-
-    Mesh::Point VertexPoint = mesh_.point(v_it);
-
-    for (vhe_it=mesh_.voh_iter(v_it); vhe_it; ++vhe_it)
-    {
-      h = mesh_.halfedge_handle(vhe_it);
-      Mesh::VertexHandle CurrentVertex = mesh_.to_vertex_handle(vhe_it);
-      Mesh::Point CurrentPoint = mesh_.point(CurrentVertex);
-      OpenMesh::Vec3f Vec = mesh_.property(eweight_,mesh_.edge_handle(vhe_it)) * (CurrentPoint - VertexPoint);
-
-      laplace += Vec;
-    }
-    //laplace = laplace*mesh_.property(vweight_,v_it);
-    Mesh::Scalar Curvature = 0.5*laplace.norm();
-
-    mesh_.property(vcurvature_,v_it) = Curvature; 
-  }
-  for (v_it=mesh_.vertices_begin(); v_it != v_end; ++v_it)
-  {
-    if (mesh_.is_boundary(v_it))
-    {
-      Mesh::Scalar Curvature=0.;
-      int NbPoints = 0;
-      for (vv_it=mesh_.vv_iter(v_it); vv_it; ++vv_it)
-      {
-        if (!mesh_.is_boundary(vv_it))
-        {
-          Curvature += mesh_.property(vcurvature_,vv_it);
-          NbPoints++;
-        }
-      }
-      mesh_.property(vcurvature_,v_it) = (NbPoints>0? Curvature/NbPoints: 0);
-    }
-  }
 }
 
-void 
-QualityViewer::
-calc_uniform_mean_curvature()
+void QualityViewer::calc_uniform_mean_curvature()
 {
-	Mesh::VertexIter        v_it, v_end(mesh_.vertices_end());
-	Mesh::VertexVertexIter  vv_it;
-	
 	// ------------- IMPLEMENT HERE ---------
 	// TASK 3.1.a Approximate mean curvature using the length of the uniform Laplacian approximation
 	// Save your approximation in vunicurvature_ vertex property of the mesh.
 	// ------------- IMPLEMENT HERE ---------
-  for (v_it=mesh_.vertices_begin(); v_it != v_end; ++v_it)
-  {
-    int n_vertices = 0;
-    Mesh::Point VertexPoint = mesh_.point(v_it);
-    Mesh::Point MiddlePoint(0.0, 0.0, 0.0);
 
-    for (vv_it=mesh_.vv_iter(v_it); vv_it; ++vv_it)
-    {
-      MiddlePoint += mesh_.point(vv_it);
-      n_vertices++;
-      if (mesh_.is_boundary(v_it))
-      {
-        Vec3f Normal = mesh_.normal(v_it);
-        Vec3f Vec1 = mesh_.point(vv_it)-VertexPoint;
-        Vec3f NormalComponent = (Vec1|Normal)*Normal;
-        Vec3f TangentComponent = Vec1-NormalComponent;
-        Vec3f Vec2 = NormalComponent-TangentComponent;
-        Mesh::Point OppositePoint = VertexPoint+Vec2;
-        MiddlePoint += OppositePoint;
-        n_vertices++;
-      }
-    }
-    MiddlePoint = MiddlePoint*(1./n_vertices);
-    Mesh::Scalar Curvature = 0.5* (MiddlePoint-VertexPoint).norm();
-
-    mesh_.property(vunicurvature_,v_it) = Curvature;
-  }
+	UniformLaplacian l(mesh_);
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		Mesh::Scalar curvature = 0.5 * l(vit);
+		mesh_.property(vunicurvature_, vit) = curvature;
+	}
 }
 
-void 
-QualityViewer::
-calc_gauss_curvature()
+void QualityViewer::calc_gauss_curvature()
 {
-	Mesh::VertexIter        v_it, v_end(mesh_.vertices_end());
-	Mesh::VertexVertexIter  vv_it, vv_it2, vprec, vsuiv, vfirst;
-	Mesh::Point             d0, d1;
-	Mesh::Scalar            angles, cos_angle;
-	Mesh::Scalar            lb(-1.0), ub(1.0);
-
 	// ------------- IMPLEMENT HERE ---------
 	// TASK 3.4 Approximate Gaussian curvature.
 	// Hint: When calculating angles out of cross products make sure the value 
 	// you pass to the acos function is between -1.0 and 1.0.
 	// Use the vweight_ property for the area weight.
 	// ------------- IMPLEMENT HERE ---------
-
-  for (v_it=mesh_.vertices_begin(); v_it != v_end; ++v_it)
-  {
-    int ind=0;
-    Mesh::Point VPrec, V, VSuiv, First;
-    V = mesh_.point(v_it);
-    angles = 0.;
-
-    Mesh::Scalar ProjAngles = 0.;
-    for (vv_it=mesh_.vv_iter(v_it); vv_it; ++vv_it)
-    {
-      VSuiv = mesh_.point(vv_it);
-      vsuiv = vv_it;
-      if (ind>0)
-      {
-        if (!mesh_.is_boundary(v_it) || !mesh_.is_boundary(vprec) || !mesh_.is_boundary(vsuiv))
-        {
-          Mesh::Scalar angle;
-          Mesh::Scalar denom = (VPrec-V).norm()*(VSuiv-V).norm();
-          if (denom > FLT_MIN)
-          {
-            angle = acos((VPrec-V)|(VSuiv-V)/denom);
-          }
-          else
-          {
-            angle = 0;
-          }
-          angles += angle;
-
-          Vec3f Normal = mesh_.normal(v_it);
-          Vec3f Vec1 = VPrec-V;
-          Vec1 = Vec1 - (Vec1|Normal)*Normal;
-
-          Vec3f Vec2 = VSuiv-V;
-          Vec2 = Vec2 - (Vec2|Normal)*Normal;
-
-          denom = Vec2.norm()*Vec1.norm();
-          if (denom > FLT_MIN)
-          {
-            angle = acos((Vec2|Vec1)/denom);
-          }
-          else
-          {
-            angle = 0;
-          }
-          ProjAngles += angle; 
-        }
-      }
-      else
-      {
-        First = VSuiv;
-        vfirst = vsuiv;
-      }
-      ind++;
-      VPrec = VSuiv;
-      vprec = vsuiv;
-    }
-    if (!mesh_.is_boundary(v_it) || !mesh_.is_boundary(vprec) || !mesh_.is_boundary(vfirst))
-    {
-      Mesh::Scalar angle;
-      Mesh::Scalar denom = (VPrec-V).norm()*(First-V).norm();
-      if (denom > FLT_MIN)
-      {
-        angle = acos((VPrec-V)|(First-V)/denom);
-      }
-      else
-      {
-        angle = 0;
-      }
-      angles += angle;
-
-      Vec3f Normal = mesh_.normal(v_it);
-      Vec3f Vec1 = VPrec-V;
-      Vec1 = Vec1 - (Vec1|Normal)*Normal;
-
-      Vec3f Vec2 = First-V;
-      Vec2 = Vec2 - (Vec2|Normal)*Normal;
-
-      denom = Vec2.norm()*Vec1.norm();
-      if (denom > FLT_MIN)
-      {
-        angle = acos((Vec2|Vec1)/denom);
-      }
-      else
-      {
-        angle = 0;
-      }
-      ProjAngles += angle; 
-    }
-    //Mesh::Scalar Curvature = 2*(2*M_PI - angles)*mesh_.property(vweight_,v_it);
-    Mesh::Scalar Curvature = ProjAngles - angles;
-    mesh_.property(vgausscurvature_,v_it) = Curvature;
-  }
 }
 
-//-----------------------------------------------------------------------------
-
-
-void 
-QualityViewer::
-calc_triangle_quality()
+void QualityViewer::calc_triangle_quality()
 {
-	Mesh::FaceIter				f_it, f_end(mesh_.faces_end());
-	Mesh::ConstFaceVertexIter	fvIt;
-	OpenMesh::Vec3f				v0,v1,v2;
-	OpenMesh::Vec3f				v0v1,v0v2,v1v2;
-	Mesh::Scalar				denom, circum_radius_sq, min_length_sq;
-
 	// ------------- IMPLEMENT HERE ---------
 	// TASK 3.2 Compute triangle shape measure and save it in the tshape_ property
 	// For numerical stability you might want to set the property value to
 	// a predifined large value (e.g. FLT_MAX) if the denominator is smaller than FLT_MIN
 	// ------------- IMPLEMENT HERE ---------
-  for (f_it=mesh_.faces_begin(); f_it!=f_end; ++f_it)
-  {
-    fvIt = mesh_.fv_iter(f_it);
-    Mesh::Point P = mesh_.point(fvIt);  ++fvIt;
-		Mesh::Point Q = mesh_.point(fvIt);  ++fvIt;
-		Mesh::Point R = mesh_.point(fvIt);
+	Mesh::FaceIter				fit;
+	Mesh::ConstFaceVertexIter	fvit;
+	OpenMesh::Vec3f				v0,v1,v2;
+	OpenMesh::Vec3f				v0v1,v0v2,v1v2;
+	Mesh::Scalar				rad2, minLen2;
+	float						fratio;
+	for (fit = mesh_.faces_begin(); fit != mesh_.faces_end(); ++fit)
+	{
+		fratio = 0;
 
-    v0 = P-Q;
-    v1 = Q-R;
-    v2 = P-R;
-    float denom = 4*(v0%v1).sqrnorm();
-    circum_radius_sq =0.;
-    if (denom > FLT_MIN)
-    {
-      circum_radius_sq = v0.sqrnorm()*v1.sqrnorm()*v2.sqrnorm()/denom;
-    }
-    else
-    {
-      circum_radius_sq = FLT_MAX;
-    }
-    min_length_sq = v0.sqrnorm();
-    Mesh::Scalar lengh = v1.sqrnorm();
-    Mesh::Scalar lengh2 = v2.sqrnorm();
-    if (lengh < min_length_sq)
-    {
-      min_length_sq = lengh;
-    }
-    if (lengh2 < min_length_sq)
-    {
-      min_length_sq = lengh2;
-    }
-    float ratio = 0.;
-    if (min_length_sq > FLT_MIN)
-    {
-      ratio = sqrt(circum_radius_sq/min_length_sq);
-    }
-    else
-    {
-      ratio = FLT_MAX;
-    }
-    mesh_.property(tshape_, f_it) = ratio;
-  }
+		fvit = mesh_.fv_iter(fit);
+		Mesh::Point p1 = mesh_.point(fvit);  
+		++fvit;
+		Mesh::Point p2 = mesh_.point(fvit);  
+		++fvit;
+		Mesh::Point p3 = mesh_.point(fvit);
+
+		v0 = p1 - p2;
+		v1 = p2 - p3;
+		v2 = p1 - p3;
+
+		float denom = 4 * (v0 % v1).sqrnorm();
+		rad2 = 0;
+
+		if (denom > FLT_MIN) {
+			rad2 = v0.sqrnorm() * v1.sqrnorm() * v2.sqrnorm() / denom;
+		}
+		else {
+			rad2 = FLT_MAX;
+		}
+
+		minLen2 = v0.sqrnorm();
+		float lengh = v1.sqrnorm();
+		float lengh2 = v2.sqrnorm();
+		if (lengh < minLen2) {
+			minLen2 = lengh;
+		}
+		if (lengh2 < minLen2) {
+			minLen2 = lengh2;
+		}
+		if (minLen2 > FLT_MIN) {
+			fratio = sqrt( rad2 / minLen2 );
+		}
+		else {
+			fratio = FLT_MAX;
+		}
+		mesh_.property(tshape_, fit) = fratio;
+	}
 }
 
-//-----------------------------------------------------------------------------
-
-void 
-QualityViewer::
-face_color_coding()
+void QualityViewer::face_color_coding()
 {
 	Mesh::ConstFaceIter        f_it, f_end(mesh_.faces_end());
 	Mesh::Scalar      sh, min_shape(FLT_MAX), max_shape(-FLT_MAX);
@@ -522,19 +242,12 @@ face_color_coding()
 	}
 }
 
-
-
-//-----------------------------------------------------------------------------
-
-
-void 
-QualityViewer::
-color_coding(Vertex_property prop)
+void QualityViewer::color_coding(ScalarVpropT prop)
 {
 	Mesh::VertexIter  v_it, v_end(mesh_.vertices_end());
 	Mesh::Scalar      curv, min(FLT_MAX), max(-FLT_MAX);
 	Mesh::Color       col;
-	
+
 	// put all values into one array
 	std::vector<Mesh::Scalar> values;
 	values.reserve(mesh_.n_vertices());
@@ -556,106 +269,71 @@ color_coding(Vertex_property prop)
 	}
 }
 
-
-QualityViewer::Mesh::Color 
-QualityViewer::
-value_to_color(QualityViewer::Mesh::Scalar value, QualityViewer::Mesh::Scalar min, QualityViewer::Mesh::Scalar max) {
+QualityViewer::Mesh::Color QualityViewer::value_to_color(QualityViewer::Mesh::Scalar value, QualityViewer::Mesh::Scalar min, QualityViewer::Mesh::Scalar max) {
 	Mesh::Scalar v0, v1, v2, v3, v4;
 	v0 = min + 0.0/4.0 * (max - min);
 	v1 = min + 1.0/4.0 * (max - min);
 	v2 = min + 2.0/4.0 * (max - min);
 	v3 = min + 3.0/4.0 * (max - min);
 	v4 = min + 4.0/4.0 * (max - min);
-
 	Mesh::Color col = Mesh::Color(255,255,255);
-
 	unsigned char u;
-
 	if (value < v0) col = Mesh::Color(0, 0, 255);
 	else if (value > v4) col = Mesh::Color(255, 0, 0);
-
-	else if (value <= v2) 
-	{
-		if (value <= v1) // [v0, v1]
-		{
+	else if (value <= v2) {
+		if (value <= v1) {
 			u = (unsigned char) (255.0 * (value - v0) / (v1 - v0));
 			col = Mesh::Color(0, u, 255);
 		}      
-		else // ]v1, v2]
-		{
+		else {
 			u = (unsigned char) (255.0 * (value - v1) / (v2 - v1));
 			col = Mesh::Color(0, 255, 255-u);
 		}
 	}
-	else 
-	{
-		if (value <= v3) // ]v2, v3]
-		{
+	else {
+		if (value <= v3) {
 			u = (unsigned char) (255.0 * (value - v2) / (v3 - v2));
 			col = Mesh::Color(u, 255, 0);
 		}
-		else // ]v3, v4]
-		{
+		else {
 			u = (unsigned char) (255.0 * (value - v3) / (v4 - v3));
 			col = Mesh::Color(255, 255-u, 0);
 		}
 	}
-
 	return col;
 }
 
-
-//-----------------------------------------------------------------------------
-
-
-void 
-QualityViewer::
-draw(const std::string& _draw_mode)
+void QualityViewer::draw(const std::string& _draw_mode)
 {
-
-	if (indices_.empty())
-	{
+	if (indices_.empty()) {
 		MeshViewer::draw(_draw_mode);
 		return;
 	}
-
 	if (_draw_mode == "Mean Curvature") color_coding(vcurvature_);
 	if (_draw_mode == "Gaussian Curvature") color_coding(vgausscurvature_);
 	if (_draw_mode == "Uniform Mean Curvature") color_coding(vunicurvature_);
-
-	if (_draw_mode == "Mean Curvature" || _draw_mode == "Gaussian Curvature" || _draw_mode == "Uniform Mean Curvature")
-	{
-
+	if (_draw_mode == "Mean Curvature" || _draw_mode == "Gaussian Curvature" || _draw_mode == "Uniform Mean Curvature") {
 		glDisable(GL_LIGHTING);
 		glShadeModel(GL_SMOOTH);
-
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		glEnableClientState(GL_COLOR_ARRAY);
 		GL::glVertexPointer(mesh_.points());
 		GL::glNormalPointer(mesh_.vertex_normals());
 		GL::glColorPointer(mesh_.vertex_colors());
-		
 		glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, &indices_[0]);
-
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
-
 	}
-
-	if (_draw_mode == "Triangle Shape")
-	{
+	if (_draw_mode == "Triangle Shape") {
 
 		glDisable(GL_LIGHTING);
 		glShadeModel(GL_FLAT);
-
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		GL::glVertexPointer(mesh_.points());
 		GL::glNormalPointer(mesh_.vertex_normals());
-
-
 		glDepthRange(0.01, 1.0);
 		glBegin(GL_TRIANGLES);
 		for (unsigned i=0; i<indices_.size(); i++)
@@ -664,30 +342,22 @@ draw(const std::string& _draw_mode)
 			glArrayElement(indices_[i]);
 		}
 		glEnd();
-
-
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
 		glDisableClientState(GL_COLOR_ARRAY);
-
 		glColor3f(0.3, 0.3, 0.3);
-
 		glEnableClientState(GL_VERTEX_ARRAY);
 		GL::glVertexPointer(mesh_.points());
-
 		glDrawBuffer(GL_BACK);
 		glDepthRange(0.0, 1.0);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		glDepthFunc(GL_LEQUAL);
 		glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, &indices_[0]);
-
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		glDepthFunc(GL_LESS);
 	}
-
-	else if (_draw_mode == "Reflection Lines")
-	{
+	else if (_draw_mode == "Reflection Lines") {
 		glTexGeni( GL_S, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 		glTexGeni( GL_T, GL_TEXTURE_GEN_MODE, GL_SPHERE_MAP );
 		glEnable( GL_TEXTURE_GEN_S );
@@ -695,26 +365,16 @@ draw(const std::string& _draw_mode)
 		glEnable( GL_TEXTURE_2D );    
 		glEnable(GL_LIGHTING);
 		glShadeModel(GL_SMOOTH);
-
 		glEnableClientState(GL_VERTEX_ARRAY);
 		glEnableClientState(GL_NORMAL_ARRAY);
 		GL::glVertexPointer(mesh_.points());
 		GL::glNormalPointer(mesh_.vertex_normals());
-
 		glDrawElements(GL_TRIANGLES, indices_.size(), GL_UNSIGNED_INT, &indices_[0]);
-
 		glDisableClientState(GL_VERTEX_ARRAY);
 		glDisableClientState(GL_NORMAL_ARRAY);
-
 		glDisable( GL_TEXTURE_GEN_S );
 		glDisable( GL_TEXTURE_GEN_T );
 		glDisable( GL_TEXTURE_2D );
 	}
-
-
-
 	else MeshViewer::draw(_draw_mode);
 }
-
-
-//=============================================================================

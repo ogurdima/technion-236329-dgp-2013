@@ -14,10 +14,15 @@
     <ClCompile Include="src\QualityViewer.cc" />
     <ClCompile Include="src\smoother.cc" />
     <ClCompile Include="src\SmoothingViewer.cc" />
+    <ClCompile Include="src\UniformLaplacian.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\QualityViewer.hh" />
     <None Include="src\SmoothingViewer.hh" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Laplacian.h" />
+    <ClInclude Include="src\UniformLaplacian.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>03-Smoothing</ProjectName>

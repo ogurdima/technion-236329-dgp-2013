@@ -40,72 +40,44 @@
 #ifndef QUALVIEWERWIDGET_HH
 #define QUALVIEWERWIDGET_HH
 
-
-//== INCLUDES =================================================================
-
-
-
 #include <MeshViewer.hh>
-
-
-//== CLASS DEFINITION =========================================================
-
-	      
 
 class QualityViewer : public MeshViewer
 {
 public:
-   
-  /// default constructor
-  QualityViewer(const char* _title, int _width, int _height);
 
-  // destructor
-  ~QualityViewer();
-
-  /// open mesh
-  virtual bool open_mesh(const char* _filename);
-
-
+	QualityViewer(const char* _title, int _width, int _height);
+	~QualityViewer();
+	virtual bool open_mesh(const char* _filename);
 
 protected:
+	typedef OpenMesh::VPropHandleT<Mesh::Scalar>	ScalarVpropT;
+	typedef OpenMesh::EPropHandleT<Mesh::Scalar>	ScalarEpropT;
+	typedef OpenMesh::FPropHandleT<Mesh::Scalar>	ScalarFpropT;
 
-  typedef OpenMesh::VPropHandleT<Mesh::Scalar> Vertex_property;
-  std::vector<float>  face_colors_;
-
-  virtual void init();
-  virtual void draw(const std::string& _draw_mode);
-
-
-  /// calculate vertex and edge weights
-  void calc_weights();
-
-  /// calculate mean curvature per vertex
-  void calc_mean_curvature();
-  void calc_uniform_mean_curvature();
-
-  void calc_gauss_curvature();
-
-  /// calculate triangle shape indices
-  void calc_triangle_quality();
-  void face_color_coding();
-
-  void find_min_max(Vertex_property prop, Mesh::Scalar& min, Mesh::Scalar& max);
-  Mesh::Color value_to_color(float value, float min, float max);
-
-  /// set vertex color from vertex curvature
-  void color_coding(Vertex_property prop);
-
-
-  OpenMesh::VPropHandleT<Mesh::Scalar>  vweight_, vunicurvature_, vcurvature_, vgausscurvature_;
-  OpenMesh::EPropHandleT<Mesh::Scalar>  eweight_;
-  OpenMesh::FPropHandleT<Mesh::Scalar>  tshape_;
-
-  GLuint  textureID_;
-
+	virtual void									init();
+	virtual void									draw(const std::string& _draw_mode);
+	void											calc_weights();
+	void											calc_mean_curvature();
+	void											calc_uniform_mean_curvature();
+	void											calc_gauss_curvature();
+	void											calc_triangle_quality();
+	void											face_color_coding();
+	void											find_min_max(ScalarVpropT prop, Mesh::Scalar& min, Mesh::Scalar& max);
+	Mesh::Color										value_to_color(float value, float min, float max);
+	void											color_coding(ScalarVpropT prop);
+	
+	
+	std::vector<float>								face_colors_;
+	OpenMesh::VPropHandleT<Mesh::Scalar>			vweight_, 
+													vunicurvature_, 
+													vcurvature_, 
+													vgausscurvature_;
+	OpenMesh::EPropHandleT<Mesh::Scalar>			eweight_;
+	OpenMesh::FPropHandleT<Mesh::Scalar>			tshape_;
+	GLuint											textureID_;
 };
 
 
-//=============================================================================
 #endif // QUALVIEWERWIDGET_HH defined
-//=============================================================================
 

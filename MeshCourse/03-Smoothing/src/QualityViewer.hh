@@ -58,6 +58,7 @@ protected:
 	virtual void									init();
 	virtual void									draw(const std::string& _draw_mode);
 	void											calc_weights();
+	double											calc_he_weight(Mesh::HalfedgeHandle he1);
 	void											calc_mean_curvature();
 	void											calc_uniform_mean_curvature();
 	void											calc_gauss_curvature();
@@ -73,6 +74,7 @@ protected:
 													vunicurvature_, 
 													vcurvature_, 
 													vgausscurvature_;
+	
 	OpenMesh::EPropHandleT<Mesh::Scalar>			eweight_;
 	OpenMesh::FPropHandleT<Mesh::Scalar>			tshape_;
 	GLuint											textureID_;

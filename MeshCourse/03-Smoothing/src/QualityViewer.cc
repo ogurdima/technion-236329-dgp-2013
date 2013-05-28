@@ -40,6 +40,7 @@
 #include <vector>
 #include <float.h>
 #include "UniformLaplacian.h"
+#include "LaplaceBeltrami.h"
 
 QualityViewer::QualityViewer(const char* _title, int _width, int _height) : 
 	MeshViewer(_title, _width, _height)
@@ -126,6 +127,45 @@ void QualityViewer::calc_weights()
 	// TASK 3.3.a Compute cotangent weights for laplacian, and produce them in the mesh edge property eweight_
 	// Use the weights from calc_weights(): eweight_
 	// ------------- IMPLEMENT HERE ---------
+
+	for (Mesh::EdgeIter eit = mesh_.edges_begin(); eit != mesh_.edges_end(); ++eit)
+	{
+		Mesh::Scalar weight = 0;
+		double w1, w2;
+
+		// Left triangle
+		Mesh::HalfedgeHandle he1 = mesh_.halfedge_handle(eit.handle(), 0);
+		w1 = calc_he_weight(he1);
+		// Right triangle
+		Mesh::HalfedgeHandle the1 = mesh_.opposite_halfedge_handle(he1);
+		w2 = calc_he_weight(the1);
+
+		weight = 0.5 * ( w1 + w2 );
+		weight = std::max(0.0f, weight);
+		mesh_.property(eweight_, eit) = weight;
+		//mesh_.property(eweight_, eit) = 1;
+	}
+
+	
+}
+
+
+double QualityViewer::calc_he_weight(Mesh::HalfedgeHandle he1)
+{
+	if ( mesh_.is_boundary(he1) ) {
+		return 0;
+	}
+	Mesh::HalfedgeHandle he2 = mesh_.next_halfedge_handle(he1);
+	Mesh::HalfedgeHandle he3 = mesh_.next_halfedge_handle(he2);
+	Mesh::VertexHandle v1 = mesh_.from_vertex_handle(he1);
+	Mesh::VertexHandle v2 = mesh_.from_vertex_handle(he2);
+	Mesh::VertexHandle v3 = mesh_.from_vertex_handle(he3);
+
+	Vec3f vec1 = (mesh_.point(v2) - mesh_.point(v3)).normalize();
+	Vec3f vec2 = (mesh_.point(v1) - mesh_.point(v3)).normalize();
+	double dprod = (vec1 | vec2);
+	double alpha = acos( std::min( 0.99, std::max(-0.99, dprod ) ) );
+	return (1.0 / tan(alpha));
 }
 
 void QualityViewer::calc_mean_curvature()
@@ -135,6 +175,12 @@ void QualityViewer::calc_mean_curvature()
 	// Save your approximation in vcurvature_ vertex property of the mesh.
 	// Use the weights from calc_weights(): eweight_ and vweight_
 	// ------------- IMPLEMENT HERE ---------
+	LaplaceBeltrami l(mesh_, eweight_);
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		Mesh::Scalar curvature = 0.5 * l(vit).norm();
+		mesh_.property(vcurvature_, vit) = curvature;
+	}
+
 }
 
 void QualityViewer::calc_uniform_mean_curvature()
@@ -146,7 +192,7 @@ void QualityViewer::calc_uniform_mean_curvature()
 
 	UniformLaplacian l(mesh_);
 	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
-		Mesh::Scalar curvature = 0.5 * l(vit);
+		Mesh::Scalar curvature = 0.5 * l(vit).norm();
 		mesh_.property(vunicurvature_, vit) = curvature;
 	}
 }
@@ -159,6 +205,40 @@ void QualityViewer::calc_gauss_curvature()
 	// you pass to the acos function is between -1.0 and 1.0.
 	// Use the vweight_ property for the area weight.
 	// ------------- IMPLEMENT HERE ---------
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		VertexHandle v0 = vit.handle();
+		Mesh::Point p0 = mesh_.point(v0);
+		double sumOfAngles = 0;
+		for(Mesh::VertexFaceIter fit = mesh_.vf_begin(vit); fit; ++fit) {
+			Mesh::FaceHalfedgeIter heit = mesh_.fh_begin(fit);
+			VertexHandle v;
+			for (; heit; ++heit) {
+				v = mesh_.from_vertex_handle(heit.handle());
+				if (v == v0) {
+					break;
+				}
+			}
+
+			HalfedgeHandle he1 = heit.handle();
+			HalfedgeHandle he1twin = mesh_.opposite_halfedge_handle(he1);
+			HalfedgeHandle he2 = mesh_.next_halfedge_handle(he1twin);
+
+			VertexHandle v1 = mesh_.to_vertex_handle(he1);
+			Mesh::Point p1 = mesh_.point(v1);
+			VertexHandle v2 = mesh_.to_vertex_handle(he2);
+			Mesh::Point p2 = mesh_.point(v2);
+
+			Vec3f a = (p1 - p0).normalize();
+			Vec3f b = (p2 - p0).normalize();
+
+			double dprod = (a | b);
+			double alpha = acos( std::min( 0.99, std::max(-0.99, dprod ) ) );
+			sumOfAngles += alpha;
+		}
+		Mesh::Scalar gausCurv = (2*M_PI) - sumOfAngles;
+		mesh_.property(vgausscurvature_, vit) = gausCurv;
+	}
+
 }
 
 void QualityViewer::calc_triangle_quality()

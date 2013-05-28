@@ -41,49 +41,25 @@
 #define SMOOTHING_VIEWER_HH
 
 
-//== INCLUDES =================================================================
-
-
 #include "QualityViewer.hh"
+#include "Laplacian.h"
 
-
-
-//== CLASS DEFINITION =========================================================
-
-	      
 
 class SmoothingViewer : public QualityViewer
 {
 public:
-   
-  /// default constructor
-  SmoothingViewer(const char* _title, int _width, int _height);
+												SmoothingViewer(const char* _title, int _width, int _height);
+	void										smooth(unsigned int _iters);
+	void										uniform_smooth(unsigned int _iters);
 
-  /// iterative Laplacian smoothing
-  void smooth(unsigned int _iters);
-
-  void uniform_smooth(unsigned int _iters);
-
-
-private:
-
-
-  virtual void keyboard(int key, int x, int y);
-
-
-  // easier access to new vertex positions
-  Mesh::Point& new_pos(Mesh::VertexHandle _vh) 
-  { return mesh_.property(vpos_, _vh); }
-
-
-
-private:
-
-  OpenMesh::VPropHandleT<Mesh::Point>   vpos_;
+protected:
+	virtual void								keyboard(int key, int x, int y);
+	Mesh::Point&								new_pos(Mesh::VertexHandle _vh) { 
+		return mesh_.property(vpos_, _vh); 
+	}
+	OpenMesh::VPropHandleT<Mesh::Point>			vpos_;
+	void										generic_smooth_iter(Laplacian* l);
 };
 
-
-//=============================================================================
 #endif // SMOOTHING_VIEWER_HH defined
-//=============================================================================
 

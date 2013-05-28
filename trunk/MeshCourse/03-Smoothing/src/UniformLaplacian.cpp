@@ -13,7 +13,7 @@ UniformLaplacian::~UniformLaplacian(void)
 }
 
 
-float UniformLaplacian::operator()(Mesh::VertexIter vit)
+OpenMesh::Vec3f UniformLaplacian::operator()(Mesh::VertexIter vit)
 {
 	Mesh::VertexVertexIter vvit;
 	int				neighbors	= 0;
@@ -36,5 +36,5 @@ float UniformLaplacian::operator()(Mesh::VertexIter vit)
 		}
 	}
 	midPoint = midPoint * (1.0/neighbors);
-	return (midPoint - curVertex).norm();
+	return (midPoint - curVertex);
 }

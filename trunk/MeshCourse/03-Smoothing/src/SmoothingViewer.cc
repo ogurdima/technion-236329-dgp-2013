@@ -30,41 +30,22 @@
 //   Boston, MA  02110-1301, USA.
 //                                                                            
 //=============================================================================
-//=============================================================================
-//
-//  CLASS SmoothingViewer - IMPLEMENTATION
-//
-//=============================================================================
-
-
-//== INCLUDES =================================================================
 
 #include "SmoothingViewer.hh"
+#include "UniformLaplacian.h"
+#include "LaplaceBeltrami.h"
 
-
-
-//== IMPLEMENTATION ========================================================== 
-
-
-SmoothingViewer::
-SmoothingViewer(const char* _title, int _width, int _height)
-  : QualityViewer(_title, _width, _height)
+SmoothingViewer::SmoothingViewer(const char* _title, int _width, int _height): 
+QualityViewer(_title, _width, _height)
 { 
-  mesh_.add_property(vpos_);
+	mesh_.add_property(vpos_);
 }
 
-
-//-----------------------------------------------------------------------------
-
-
-void
-SmoothingViewer::
-keyboard(int key, int x, int y)
+void SmoothingViewer::keyboard(int key, int x, int y)
 {
 	switch (toupper(key))
 	{
-	case 'N':
-		{
+	case 'N': {
 			std::cout << "10 Laplace-Beltrami smoothing iterations: " << std::flush;
 			smooth(10);
 			calc_weights();
@@ -73,13 +54,11 @@ keyboard(int key, int x, int y)
 			calc_gauss_curvature();
 			calc_triangle_quality();
 			face_color_coding();
-
 			glutPostRedisplay();
 			std::cout << "done\n";
 			break;
 		}
-	case 'U':
-		{
+	case 'U': {
 			std::cout << "10 uniform smoothing iterations: " << std::flush;
 			uniform_smooth(10);
 			calc_weights();
@@ -88,45 +67,50 @@ keyboard(int key, int x, int y)
 			calc_gauss_curvature();
 			calc_triangle_quality();
 			face_color_coding();
-
 			glutPostRedisplay();
 			std::cout << "done\n";
 			break;
 		}
-
-
-	default:
-		{
+	default: {
 			QualityViewer::keyboard(key, x, y);
 			break;
 		}
 	}
 }
 
-
-//-----------------------------------------------------------------------------
-
-
-void 
-SmoothingViewer::
-smooth(unsigned int _iters)
+void SmoothingViewer::smooth(unsigned int _iters)
 {
 	// ------------- IMPLEMENT HERE ---------
 	// TASK 3.3.b Smoothing using the Laplace-Beltrami.
 	// Use eweight_ properties for the individual edge weights
 	// and their sum for the normalization term.
 	// ------------- IMPLEMENT HERE ---------
+	for (int i = 0; i < _iters; i++) {
+		LaplaceBeltrami l(mesh_, eweight_);
+		generic_smooth_iter(&l);
+	}
 }
 
-//-----------------------------------------------------------------------------
-
-void 
-SmoothingViewer::
-uniform_smooth(unsigned int _iters)
+void SmoothingViewer::uniform_smooth(unsigned int _iters)
 {
 	// ------------- IMPLEMENT HERE ---------
 	// TASK 3.1.b Smoothing using the uniform Laplacian approximation
 	// ------------- IMPLEMENT HERE ---------
+	for (int i = 0; i < _iters; i++) {
+		UniformLaplacian l(mesh_);
+		generic_smooth_iter(&l);
+	}
 }
 
-//=============================================================================
+void SmoothingViewer::generic_smooth_iter(Laplacian* l)
+{
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		Mesh::Point p = mesh_.point(vit.handle());
+		Vec3f dir = l->operator()(vit);
+		mesh_.property(vpos_, vit) = p + (dir * 0.5);
+	}
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		mesh_.set_point( vit.handle(), mesh_.property(vpos_, vit) );
+	}
+	mesh_.update_normals();
+}

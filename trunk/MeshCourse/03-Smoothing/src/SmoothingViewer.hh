@@ -49,8 +49,10 @@ class SmoothingViewer : public QualityViewer
 {
 public:
 												SmoothingViewer(const char* _title, int _width, int _height);
+	virtual bool								open_mesh(const char* _filename);
 	void										smooth(unsigned int _iters);
 	void										uniform_smooth(unsigned int _iters);
+	void										tangential_smooth(unsigned int _iters);
 
 protected:
 	virtual void								keyboard(int key, int x, int y);
@@ -58,7 +60,10 @@ protected:
 		return mesh_.property(vpos_, _vh); 
 	}
 	OpenMesh::VPropHandleT<Mesh::Point>			vpos_;
+	OpenMesh::VPropHandleT<Mesh::Normal>		vnorm_;
 	void										generic_smooth_iter(Laplacian* l);
+	void										tangential_smooth_iter(Laplacian* l);
+	
 };
 
 #endif // SMOOTHING_VIEWER_HH defined

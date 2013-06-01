@@ -16,9 +16,12 @@ LaplaceBeltrami::~LaplaceBeltrami(void)
 
 OpenMesh::Vec3f LaplaceBeltrami::operator()(Mesh::VertexIter vit)
 {
-	Point origPoint = m.point(vit);
+	if (m.is_boundary(vit)) {
+		return Vec3f(0,0,0);
+	}
+	Point origPoint = m.point(vit.handle());
 	Point midPoint = Point(0,0,0);
-	float totalWeight;
+	float totalWeight = 0;
 	for (VertexOHalfedgeIter hit = m.voh_iter(vit); hit; ++hit)
 	{
 		Point neighbor = m.point( m.to_vertex_handle( hit.handle() ) );

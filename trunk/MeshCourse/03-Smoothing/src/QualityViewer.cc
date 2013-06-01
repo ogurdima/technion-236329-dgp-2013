@@ -180,7 +180,6 @@ void QualityViewer::calc_mean_curvature()
 		Mesh::Scalar curvature = 0.5 * l(vit).norm();
 		mesh_.property(vcurvature_, vit) = curvature;
 	}
-
 }
 
 void QualityViewer::calc_uniform_mean_curvature()

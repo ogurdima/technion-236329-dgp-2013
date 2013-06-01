@@ -31,13 +31,9 @@
 //=============================================================================
 #include "DecimationViewer.hh"
 
-
-
 int main(int argc, char **argv)
 {
-  glutInit(&argc, argv);
-
-  DecimationViewer window("Decimation", 512, 512);
-
-  glutMainLoop();
+	glutInit(&argc, argv);
+	DecimationViewer window("Decimation", 512, 512);
+	glutMainLoop();
 }

@@ -19,6 +19,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02-ReconViewer", "02-ReconV
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03-Smoothing", "03-Smoothing\Smoothing.vcxproj", "{59E8CB46-6CC3-4243-B58E-6E89A7C1CBCC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IsoEx", "IsoEx\IsoEx.vcxproj", "{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -59,6 +61,12 @@ Global
 		{59E8CB46-6CC3-4243-B58E-6E89A7C1CBCC}.Release|Win32.ActiveCfg = Release|Win32
 		{59E8CB46-6CC3-4243-B58E-6E89A7C1CBCC}.ReleaseBunny|Win32.ActiveCfg = ReleaseBunny|Win32
 		{59E8CB46-6CC3-4243-B58E-6E89A7C1CBCC}.ReleaseBunny|Win32.Build.0 = ReleaseBunny|Win32
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}.Debug|Win32.Build.0 = Debug|Win32
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}.Release|Win32.ActiveCfg = Release|Win32
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}.Release|Win32.Build.0 = Release|Win32
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}.ReleaseBunny|Win32.ActiveCfg = ReleaseBunny|Win32
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}.ReleaseBunny|Win32.Build.0 = ReleaseBunny|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

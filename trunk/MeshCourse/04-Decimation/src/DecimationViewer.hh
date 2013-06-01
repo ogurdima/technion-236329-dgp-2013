@@ -36,69 +36,55 @@
 //
 //=============================================================================
 
-
 #ifndef DECIMATIONVIEWERWIDGET_HH
 #define DECIMATIONVIEWERWIDGET_HH
-
-
-//== INCLUDES =================================================================
-
 
 #include "MeshViewer.hh"
 #include "QuadricT.hh"
 #include <set>
 
-//== CLASS DEFINITION =========================================================
-
-
 class DecimationViewer : public MeshViewer
 {
-
 protected:
-
-	typedef OpenMesh::TriMesh_ArrayKernelT<>  Mesh;
-	int percentage_;
+	typedef	OpenMesh::TriMesh_ArrayKernelT<>						Mesh;
+	int																percentage_;
 public:
-
-	/// default constructor
-	DecimationViewer(const char* _title, int _width, int _height);
-	~DecimationViewer() {};
-	virtual void keyboard(int key, int x, int y);
-
-	//mesh decimation actions
-	void  init();
-	bool  is_collapse_legal(Mesh::HalfedgeHandle _hh);
-	float priority(Mesh::HalfedgeHandle _heh);
-	void  decimate(unsigned int _n_vertices);
-	void  enqueue_vertex(Mesh::VertexHandle vh);
-
-	// access quadric of vertex _vh
-	Quadricd& quadric(Mesh::VertexHandle _vh)  { return mesh_.property(vquadric, _vh); }
-
+																	DecimationViewer(const char* _title, int _width, int _height);
+																	~DecimationViewer() {};
+	virtual void													keyboard(int key, int x, int y);
+	void															init();
+	bool															is_collapse_legal(Mesh::HalfedgeHandle _hh);
+	float															priority(Mesh::HalfedgeHandle _heh);
+	void															decimate(unsigned int _n_vertices);
+	void															enqueue_vertex(Mesh::VertexHandle vh);
+	Quadricd&														quadric(Mesh::VertexHandle _vh)  
+	{ 
+		return mesh_.property(vquadric, _vh);
+	}
 	// access priority of vertex _vh
-	float& priority(Mesh::VertexHandle _vh) { return mesh_.property(vprio, _vh); }
-
+	float&															priority(Mesh::VertexHandle _vh) 
+	{ 
+		return mesh_.property(vprio, _vh); 
+	}
 	// access target halfedge of vertex _vh
-	Mesh::HalfedgeHandle& target(Mesh::VertexHandle _vh) { return mesh_.property(vtarget, _vh); }
-
+	Mesh::HalfedgeHandle&											target(Mesh::VertexHandle _vh) 
+	{ 
+		return mesh_.property(vtarget, _vh); 
+	}
 protected:
+	Mesh															mesh_;
+	std::vector<unsigned int>										indices_;
+	OpenMesh::VPropHandleT<Quadricd>								vquadric;
+	OpenMesh::VPropHandleT<float>									vprio;
+	OpenMesh::VPropHandleT<Mesh::HalfedgeHandle>					vtarget;
 
-	Mesh                       mesh_;
-	std::vector<unsigned int>  indices_;
-
-	OpenMesh::VPropHandleT<Quadricd>                vquadric;
-	OpenMesh::VPropHandleT<float>                   vprio;
-	OpenMesh::VPropHandleT<Mesh::HalfedgeHandle>   vtarget;
-
-	struct QueueVertex{
+	struct QueueVertex {
 		Mesh::VertexHandle v;
 		float prio;
 	};
-
 	// compare functor for priority queue
 	struct VertexCmp
 	{
-
 		bool operator()(QueueVertex _v0, QueueVertex _v1) const
 		{
 			// std::set needs UNIQUE keys -> handle equal priorities
@@ -107,14 +93,8 @@ protected:
 			(  _v0.prio <   _v1.prio));
 		}
 	};
-
-
-	std::set<QueueVertex, VertexCmp>  queue;
-
+	std::set<QueueVertex, VertexCmp>								queue;
 };
 
-
-//=============================================================================
 #endif // QUALVIEWERWIDGET_HH defined
-//=============================================================================
 

@@ -15,6 +15,9 @@ UniformLaplacian::~UniformLaplacian(void)
 
 OpenMesh::Vec3f UniformLaplacian::operator()(Mesh::VertexIter vit)
 {
+	if (m.is_boundary(vit)) {
+		return Vec3f(0,0,0);
+	}
 	Mesh::VertexVertexIter vvit;
 	int				neighbors	= 0;
 	Point			curVertex	= m.point(vit);
@@ -24,16 +27,6 @@ OpenMesh::Vec3f UniformLaplacian::operator()(Mesh::VertexIter vit)
 	{
 		midPoint += m.point(vvit);
 		neighbors++;
-		if (m.is_boundary(vit))
-		{
-			Vec3f n = m.normal(vit);
-			Vec3f offset = m.point(vvit) - curVertex;
-			Vec3f normalOffset = (offset | n) * n;
-			Vec3f tangentOffset = offset - normalOffset;
-			Point tangentCompensator = curVertex + normalOffset - tangentOffset;
-			midPoint += tangentCompensator;
-			neighbors++;
-		}
 	}
 	midPoint = midPoint * (1.0/neighbors);
 	return (midPoint - curVertex);

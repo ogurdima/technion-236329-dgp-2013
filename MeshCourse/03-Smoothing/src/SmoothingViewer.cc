@@ -39,6 +39,21 @@ SmoothingViewer::SmoothingViewer(const char* _title, int _width, int _height):
 QualityViewer(_title, _width, _height)
 { 
 	mesh_.add_property(vpos_);
+	mesh_.add_property(vnorm_);
+	
+}
+
+bool SmoothingViewer::open_mesh(const char* _filename)
+{
+	bool res = QualityViewer::open_mesh(_filename);
+	if (!res) {
+		return false;
+	}
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		Mesh::Normal nrm = mesh_.normal(vit.handle());
+		mesh_.property(vnorm_, vit.handle()) = nrm.normalize();
+	}
+	return true;
 }
 
 void SmoothingViewer::keyboard(int key, int x, int y)
@@ -48,34 +63,31 @@ void SmoothingViewer::keyboard(int key, int x, int y)
 	case 'N': {
 			std::cout << "10 Laplace-Beltrami smoothing iterations: " << std::flush;
 			smooth(10);
-			calc_weights();
-			calc_mean_curvature();
-			calc_uniform_mean_curvature();
-			calc_gauss_curvature();
-			calc_triangle_quality();
-			face_color_coding();
-			glutPostRedisplay();
-			std::cout << "done\n";
 			break;
 		}
 	case 'U': {
 			std::cout << "10 uniform smoothing iterations: " << std::flush;
 			uniform_smooth(10);
-			calc_weights();
-			calc_mean_curvature();
-			calc_uniform_mean_curvature();
-			calc_gauss_curvature();
-			calc_triangle_quality();
-			face_color_coding();
-			glutPostRedisplay();
-			std::cout << "done\n";
+			break;
+		}
+	case 'T': {
+			std::cout << "10 tangential smoothing iterations: " << std::flush;
+			tangential_smooth(10);
 			break;
 		}
 	default: {
 			QualityViewer::keyboard(key, x, y);
-			break;
+			return;
 		}
 	}
+	calc_weights();
+	calc_mean_curvature();
+	calc_uniform_mean_curvature();
+	calc_gauss_curvature();
+	calc_triangle_quality();
+	face_color_coding();
+	glutPostRedisplay();
+	std::cout << "done\n";
 }
 
 void SmoothingViewer::smooth(unsigned int _iters)
@@ -102,12 +114,37 @@ void SmoothingViewer::uniform_smooth(unsigned int _iters)
 	}
 }
 
+void SmoothingViewer::tangential_smooth(unsigned int _iters)
+{
+	for (int i = 0; i < _iters; i++) {
+		UniformLaplacian l(mesh_);
+		tangential_smooth_iter(&l);
+	}
+}
+
 void SmoothingViewer::generic_smooth_iter(Laplacian* l)
 {
 	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
 		Mesh::Point p = mesh_.point(vit.handle());
 		Vec3f dir = l->operator()(vit);
 		mesh_.property(vpos_, vit) = p + (dir * 0.5);
+	}
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		mesh_.set_point( vit.handle(), mesh_.property(vpos_, vit) );
+	}
+	mesh_.update_normals();
+}
+
+void SmoothingViewer::tangential_smooth_iter(Laplacian* l)
+{
+	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
+		Mesh::Point p = mesh_.point(vit.handle());
+		Vec3f dir = l->operator()(vit);
+		Vec3f norm = mesh_.property(vnorm_, vit.handle());
+		double len = (norm | dir);
+		Vec3f ortho = norm * len;
+		Vec3f tangent = dir - ortho;
+		mesh_.property(vpos_, vit) = p + (tangent * 0.5);
 	}
 	for(Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); ++vit) {
 		mesh_.set_point( vit.handle(), mesh_.property(vpos_, vit) );

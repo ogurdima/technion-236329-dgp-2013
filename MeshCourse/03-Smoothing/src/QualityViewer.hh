@@ -46,9 +46,9 @@ class QualityViewer : public MeshViewer
 {
 public:
 
-	QualityViewer(const char* _title, int _width, int _height);
-	~QualityViewer();
-	virtual bool open_mesh(const char* _filename);
+													QualityViewer(const char* _title, int _width, int _height);
+													~QualityViewer();
+	virtual bool									open_mesh(const char* _filename);
 
 protected:
 	typedef OpenMesh::VPropHandleT<Mesh::Scalar>	ScalarVpropT;

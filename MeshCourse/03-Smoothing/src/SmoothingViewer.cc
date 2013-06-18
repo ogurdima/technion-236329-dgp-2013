@@ -31,9 +31,12 @@
 //                                                                            
 //=============================================================================
 
+
 #include "SmoothingViewer.hh"
 #include "UniformLaplacian.h"
 #include "LaplaceBeltrami.h"
+#include <windows.h>
+
 
 SmoothingViewer::SmoothingViewer(const char* _title, int _width, int _height): 
 QualityViewer(_title, _width, _height)
@@ -60,6 +63,22 @@ void SmoothingViewer::keyboard(int key, int x, int y)
 {
 	switch (toupper(key))
 	{
+	case 'O':
+		{
+			OPENFILENAME ofn={0};
+			char szFileName[MAX_PATH]={0};
+			ofn.lStructSize=sizeof(OPENFILENAME);
+			ofn.Flags=OFN_ALLOWMULTISELECT|OFN_EXPLORER;
+			ofn.lpstrFilter="All Files (*.*)\0*.*\0";
+			ofn.lpstrFile=szFileName;
+			ofn.nMaxFile=MAX_PATH;
+			if(GetOpenFileName(&ofn))
+			{
+				mesh_.clear();
+				MeshViewer::open_mesh(szFileName);
+			}
+		}
+		break;
 	case 'N': {
 			std::cout << "10 Laplace-Beltrami smoothing iterations: " << std::flush;
 			smooth(10);

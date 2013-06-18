@@ -42,13 +42,15 @@
 #include "MeshViewer.hh"
 #include "QuadricT.hh"
 #include <set>
+#include <gmm.h>
 
 class DecimationViewer : public MeshViewer
 {
-protected:
-	typedef	OpenMesh::TriMesh_ArrayKernelT<>						Mesh;
-	int																percentage_;
+
 public:
+	typedef gmm::dense_matrix<double>								gmmMatrix;
+	typedef std::vector<double>										gmmVector;
+
 																	DecimationViewer(const char* _title, int _width, int _height);
 																	~DecimationViewer() {};
 	virtual void													keyboard(int key, int x, int y);
@@ -72,7 +74,10 @@ public:
 		return mesh_.property(vtarget, _vh); 
 	}
 protected:
-	Mesh															mesh_;
+	typedef	OpenMesh::TriMesh_ArrayKernelT<>						Mesh;
+	int																percentage_;
+	bool															useEdgeCollapse;
+	//Mesh															mesh_;
 	std::vector<unsigned int>										indices_;
 	OpenMesh::VPropHandleT<Quadricd>								vquadric;
 	OpenMesh::VPropHandleT<float>									vprio;
@@ -94,6 +99,11 @@ protected:
 		}
 	};
 	std::set<QueueVertex, VertexCmp>								queue;
+	typedef std::set<QueueVertex, VertexCmp>::iterator				queue_iterator;
+
+	void															solve_linear_system( gmmMatrix& _M, gmmVector& _b, gmmVector& _x);
+	Vec3f															new_vertex_location(Mesh::VertexHandle v, Mesh::VertexHandle t);
+
 };
 
 #endif // QUALVIEWERWIDGET_HH defined

@@ -40,6 +40,7 @@
 #define QUADRIC_HH
 
 #include <OpenMesh/Core/Geometry/VectorT.hh>
+#include <gmm.h>
 
 /** 
 class QuadricT
@@ -101,11 +102,24 @@ public:
 			+     j;
 	}
 
+	
+
+	gmm::dense_matrix<Scalar>									matrix()
+	{
+		gmm::dense_matrix<Scalar> M(4,4);
+		M(0,0) = a;		M(0,1) = b;		M(0,2) = c;		M(0,3) = d;
+		M(1,0) = b;		M(1,1) = e;		M(1,2) = f;		M(1,3) = g;
+		M(2,0) = c;		M(2,1) = f;		M(2,2) = h;		M(2,3) = i;
+		M(3,0) = 0;		M(3,1) = 0;		M(3,2) = 0;		M(3,3) = 1;
+		return M;
+	}
+
 private:
 	Scalar														a,	b,	c,	d, 
 																	e,	f,	g, 
 																		h,	i, 
 																			j;
+
 };
 
 

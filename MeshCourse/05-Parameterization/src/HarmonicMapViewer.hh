@@ -2,9 +2,6 @@
 #define HARMONIC_MAP_VIEWER_HH
 
 #include <gmm.h>
-#include "Laplacian.h"
-#include "UniformLaplacian.h"
-#include "LaplaceBeltrami.h"
 #include "MeshViewer.hh"
 
 class HarmonicMapViewer : public MeshViewer

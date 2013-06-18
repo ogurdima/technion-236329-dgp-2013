@@ -8,12 +8,12 @@
 
 
 ImplicitRBF::ImplicitRBF(	const std::vector<Vec3f>& _points, 
-							const std::vector<Vec3f>& _normals, 
-							float& epsilon, 
-							RBF& _rbf
-) :
+						 const std::vector<Vec3f>& _normals, 
+						 float& epsilon, 
+						 RBF& _rbf
+						 ) :
 rbf_(_rbf),
-epsilon_(epsilon)
+	epsilon_(epsilon)
 {
 	//////////////////////////////////////////////////////////////////////
 	// INSERT CODE:

@@ -69,31 +69,31 @@ typedef enum {TRIHARMONIC, BSPLINE} ReconRBF;
 class ReconViewer : public MeshViewer
 {
 public:
-   
-  /// default constructor
-  ReconViewer(const char* _title, int _width, int _height);
 
-  // destructor
-  ~ReconViewer();
+	/// default constructor
+	ReconViewer(const char* _title, int _width, int _height);
 
-  /// open mesh
-  virtual bool open_mesh(const char* _filename);
+	// destructor
+	~ReconViewer();
 
-  //overloading GLUT keyboard
-  virtual void keyboard(int key, int x, int y);
+	/// open mesh
+	virtual bool open_mesh(const char* _filename);
 
-  //construcing mesh from grid
-  void MeshFromFunction(Implicit* ImpFunc);
+	//overloading GLUT keyboard
+	virtual void keyboard(int key, int x, int y);
+
+	//construcing mesh from grid
+	void MeshFromFunction(Implicit* ImpFunc);
 
 
 
 protected:
 
-  virtual void draw(const std::string& _draw_mode);
-  std::vector<Point>   Points, Normals;
-  float epsilon;
-  float betha;
-  ReconRBF rbf_to_use;
+	virtual void draw(const std::string& _draw_mode);
+	std::vector<Point>   Points, Normals;
+	float epsilon;
+	float betha;
+	ReconRBF rbf_to_use;
 
 private:
 

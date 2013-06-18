@@ -53,29 +53,43 @@
 class MeshViewer : public GlutExaminer
 {
 public:
-   
-  /// default constructor
-  MeshViewer(const char* _title, int _width, int _height);
 
-  /// open mesh
-  virtual bool open_mesh(const char* _filename);
+	/// default constructor
+	MeshViewer(const char* _title, int _width, int _height);
 
-  /// update buffer with face indices
-  void update_face_indices();
+	/// open mesh
+	virtual bool open_mesh(const char* _filename);
 
-  /// draw the scene
-  virtual void draw(const std::string& _draw_mode);
-  
+	/// update buffer with face indices
+	void update_face_indices();
+
+	/// draw the scene
+	virtual void draw(const std::string& _draw_mode);
+
+
+public:
+
+	struct MyTraits : public OpenMesh::DefaultTraits 
+	{
+		VertexAttributes(	OpenMesh::Attributes::Normal	|
+			OpenMesh::Attributes::Color		| 
+			OpenMesh::Attributes::Status	
+			);
+		FaceAttributes(		OpenMesh::Attributes::Normal	|
+			OpenMesh::Attributes::Status
+			);
+		EdgeAttributes(		OpenMesh::Attributes::Status
+			);
+	};
+
+
+	typedef OpenMesh::TriMesh_ArrayKernelT<>  Mesh;
+
 
 protected:
 
-  typedef OpenMesh::TriMesh_ArrayKernelT<>  Mesh;
-  
-
-protected:
-
-  Mesh                       mesh_;
-  std::vector<unsigned int>  indices_;
+	Mesh                       mesh_;
+	std::vector<unsigned int>  indices_;
 };
 
 

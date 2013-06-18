@@ -12,17 +12,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\HarmonicMapViewer.cc" />
-    <ClCompile Include="src\LaplaceBeltrami.cpp" />
     <ClCompile Include="src\parameterizer.cc" />
-    <ClCompile Include="src\UniformLaplacian.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="src\HarmonicMapViewer.hh" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\LaplaceBeltrami.h" />
-    <ClInclude Include="src\Laplacian.h" />
-    <ClInclude Include="src\UniformLaplacian.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>05-Parameterization</ProjectName>

@@ -29,18 +29,26 @@
 //   Boston, MA  02110-1301, USA.
 //                                                                            
 //=============================================================================
+//#include <afx.h>
+//#include <afxdb.h>
 #include "ValenceViewer.hh"
 
 
 
 int main(int argc, char **argv)
 {
-  glutInit(&argc, argv);
 
-  ValenceViewer window("Valence Viewer", 512, 512);
+	/*if (!AfxWinInit(::GetModuleHandle(NULL), NULL, ::GetCommandLine(), 0))
+	{
+		exit(1);
+	}*/
 
-  if (argc>1)
-    window.open_mesh(argv[1]);
+	glutInit(&argc, argv);
 
-  glutMainLoop();
+	ValenceViewer window("Valence Viewer", 512, 512);
+
+	if (argc>1)
+		window.open_mesh(argv[1]);
+
+	glutMainLoop();
 }

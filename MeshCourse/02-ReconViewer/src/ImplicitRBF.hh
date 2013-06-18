@@ -30,7 +30,7 @@ public:
 	float operator()(const Vec3f& _p) const;
 
 private:
-	
+
 	// evaluate basis function of RBF
 	double kernel(const Vec3f& _c, const Vec3f& _x) const
 	{
@@ -38,7 +38,7 @@ private:
 		return rbf_(r);
 	} 
 
-	
+
 
 	// solve linear system _A * _x = _b
 	void solve_linear_system( gmmMatrix& _A, 

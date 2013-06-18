@@ -6,14 +6,14 @@
 
 //== IMPLEMENTATION ==========================================================
 ImplicitMLS::ImplicitMLS( const std::vector<Vec3f>& _points, 
-                          const std::vector<Vec3f>& _normals )
-: points_(_points), normals_(_normals), InvBetaSquare_(-1)
+						 const std::vector<Vec3f>& _normals )
+						 : points_(_points), normals_(_normals), InvBetaSquare_(-1)
 {
-  //////////////////////////////////////////////////////////////////////
-  // INSERT CODE:
-  // 1) compute beta for the gaussian functions
-  // 2) store the inverse of beta square for further use in operator ()
-  //////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
+	// INSERT CODE:
+	// 1) compute beta for the gaussian functions
+	// 2) store the inverse of beta square for further use in operator ()
+	//////////////////////////////////////////////////////////////////////
 	float betha = calculateBetha();
 	assert(betha != 0 );
 	InvBetaSquare_ = 1.0 / (betha * betha);
@@ -22,20 +22,20 @@ ImplicitMLS::ImplicitMLS( const std::vector<Vec3f>& _points,
 
 float ImplicitMLS::operator()(const Vec3f& _p) const
 {
-  float dist(0);
-  float d_i, phi_i, dist_i;
-  //////////////////////////////////////////////////////////////////////
-  // INSERT CODE:
-  // 1) compute MLS distance to tangent planes for point p_
-  //////////////////////////////////////////////////////////////////////
-  for (int i = 0; i < points_.size(); i++) {
-	  dist_i = (_p - points_[i]).length();
-	  d_i = normals_[i] | (_p - points_[i]);
-	  phi_i = expf( -( (dist_i*dist_i) * InvBetaSquare_ ) );
-	  dist += d_i * phi_i;
-  }
+	float dist(0);
+	float d_i, phi_i, dist_i;
+	//////////////////////////////////////////////////////////////////////
+	// INSERT CODE:
+	// 1) compute MLS distance to tangent planes for point p_
+	//////////////////////////////////////////////////////////////////////
+	for (int i = 0; i < points_.size(); i++) {
+		dist_i = (_p - points_[i]).length();
+		d_i = normals_[i] | (_p - points_[i]);
+		phi_i = expf( -( (dist_i*dist_i) * InvBetaSquare_ ) );
+		dist += d_i * phi_i;
+	}
 
-  return dist;
+	return dist;
 }
 
 //=============================================================================

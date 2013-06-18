@@ -35,12 +35,12 @@
 
 int main(int argc, char **argv)
 {
-  glutInit(&argc, argv);
+	glutInit(&argc, argv);
 
-  ReconViewer window("Surface Reconstruction", 512, 512);
+	ReconViewer window("Surface Reconstruction", 512, 512);
 
-  //if (argc>1)
-   // window.open_mesh(argv[1]);
+	//if (argc>1)
+	// window.open_mesh(argv[1]);
 
-  glutMainLoop();
+	glutMainLoop();
 }

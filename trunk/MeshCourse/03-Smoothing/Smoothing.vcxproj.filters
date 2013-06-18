@@ -34,13 +34,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\LaplaceBeltrami.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="src\Laplacian.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\UniformLaplacian.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LaplaceBeltrami.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

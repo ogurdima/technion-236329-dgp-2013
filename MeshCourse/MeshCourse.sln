@@ -8,16 +8,34 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "00-MeshViewer", "00-MeshVie
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "05-Parameterization", "05-Parameterization\Parameterization.vcxproj", "{D0E12C43-AFC7-48DC-AE91-F41420024958}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018} = {8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD} = {90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "IsoEx", "IsoEx\IsoEx.vcxproj", "{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "01-ValenceViewer", "01-ValenceViewer\ValenceViewer.vcxproj", "{FB4BF1C8-6B72-4ED1-A437-8F7EA139831E}"
+	ProjectSection(ProjectDependencies) = postProject
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD} = {90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "02-ReconViewer", "02-ReconViewer\ReconViewer.vcxproj", "{D664252E-2FC8-43B5-96B2-641E10F9D653}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018} = {8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD} = {90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "03-Smoothing", "03-Smoothing\Smoothing.vcxproj", "{59E8CB46-6CC3-4243-B58E-6E89A7C1CBCC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD} = {90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "04-Decimation", "04-Decimation\Decimation.vcxproj", "{14093B34-804C-4F47-B662-C5A555FD9577}"
+	ProjectSection(ProjectDependencies) = postProject
+		{8E45DF5D-A38A-46B2-AB9B-9E1401B0C018} = {8E45DF5D-A38A-46B2-AB9B-9E1401B0C018}
+		{90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD} = {90CEDDB6-32C4-49BD-AAC5-CE03E533BFDD}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,10 +1,10 @@
 #ifndef SUBDIVISION_VIEWER_HH
 #define SUBDIVISION_VIEWER_HH
 
-#include "MeshViewer.hh"
+#include "PolyMeshViewer.hh"
 #include <gmm.h>
 
-class SubdivisionViewer : public MeshViewer
+class SubdivisionViewer : public PolyMeshViewer
 {
 public:
 																SubdivisionViewer(const char* _title, int _width, int _height);

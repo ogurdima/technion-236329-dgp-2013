@@ -23,6 +23,9 @@
     <None Include="src\MeshViewer.hh">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="src\PolyMeshViewer.hh">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GlutExaminer.cc">
@@ -32,6 +35,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="src\MeshViewer.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PolyMeshViewer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

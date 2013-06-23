@@ -15,11 +15,13 @@
     <None Include="src\GlutExaminer.hh" />
     <None Include="src\GlutViewer.hh" />
     <None Include="src\MeshViewer.hh" />
+    <None Include="src\PolyMeshViewer.hh" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\GlutExaminer.cc" />
     <ClCompile Include="src\GlutViewer.cc" />
     <ClCompile Include="src\MeshViewer.cc" />
+    <ClCompile Include="src\PolyMeshViewer.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>00-MeshViewer</ProjectName>

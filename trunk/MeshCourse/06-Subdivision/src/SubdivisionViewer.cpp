@@ -5,7 +5,7 @@ static bool _SubdivisioneterizationComputed_u = false, _SubdivisioneterizationCo
 static bool _BoundingBox2DComputed = false;
 
 SubdivisionViewer::SubdivisionViewer(const char* _title, int _width, int _height): 
-MeshViewer(_title, _width, _height)
+PolyMeshViewer(_title, _width, _height)
 { 
 	mesh_.request_face_status();
 	mesh_.request_halfedge_status();
@@ -22,7 +22,7 @@ SubdivisionViewer::~SubdivisionViewer()
 
 void SubdivisionViewer::init()
 {
-	MeshViewer::init();
+	PolyMeshViewer::init();
 }
 
 void SubdivisionViewer::Perform_CatmullClark()
@@ -68,7 +68,7 @@ void SubdivisionViewer::Perform_Loop()
 
 bool SubdivisionViewer::open_mesh(const char* _meshfilename)
 {
-	if (MeshViewer::open_mesh(_meshfilename)) {
+	if (PolyMeshViewer::open_mesh(_meshfilename)) {
 		// store vertex initial positions and 3D mesh bounding box
 		Mesh::VertexIter v_it=mesh_.vertices_begin(), v_end(mesh_.vertices_end());
 		_bbMin3D = _bbMax3D = mesh_.point(v_it);
@@ -83,7 +83,7 @@ bool SubdivisionViewer::open_mesh(const char* _meshfilename)
 
 void SubdivisionViewer::draw(const std::string& _draw_mode)
 {
-	MeshViewer::draw(_draw_mode);
+	PolyMeshViewer::draw(_draw_mode);
 }
 
 void SubdivisionViewer::keyboard(int key, int x, int y)
@@ -111,7 +111,7 @@ void SubdivisionViewer::keyboard(int key, int x, int y)
 		glutPostRedisplay();
 		break;
 	default:
-		MeshViewer::keyboard(key, x, y);
+		PolyMeshViewer::keyboard(key, x, y);
 		break;
 	}
 }

@@ -54,32 +54,29 @@
 class PolyMeshViewer : public GlutExaminer
 {
 public:
-   
-  /// default constructor
-  PolyMeshViewer(const char* _title, int _width, int _height);
 
-  /// open mesh
-  virtual bool open_mesh(const char* _filename);
+	/// default constructor
+	PolyMeshViewer(const char* _title, int _width, int _height);
 
-  /// update buffer with face indices
-  void update_face_indices();
+	/// open mesh
+	virtual bool open_mesh(const char* _filename);
 
-  /// draw the scene
-  virtual void draw(const std::string& _draw_mode);
-  
+	/// update buffer with face indices
+	void update_face_indices();
 
-protected:
+	/// draw the scene
+	virtual void draw(const std::string& _draw_mode);
 
 	typedef OpenMesh::PolyMesh_ArrayKernelT<> Mesh;
-    typedef OpenMesh::TriMesh_ArrayKernelT<>  TriMesh;
-  
+	typedef OpenMesh::TriMesh_ArrayKernelT<>  TriMesh;
+
 
 protected:
 
-  int NumVerticesPerFace;
+	int NumVerticesPerFace;
 	Mesh                       mesh_;
-  TriMesh					 trimesh_;
-  std::vector<unsigned int>  indices_;
+	TriMesh					 trimesh_;
+	std::vector<unsigned int>  indices_;
 };
 
 

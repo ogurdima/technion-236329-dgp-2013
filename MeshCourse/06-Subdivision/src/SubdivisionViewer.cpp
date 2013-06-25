@@ -49,7 +49,7 @@ void SubdivisionViewer::Perform_CatmullClark()
 		mesh_.property(fcentroid_, fit.handle()) = getFaceCentroid(fit.handle());
 	}
 	for (Mesh::EdgeIter eit = mesh_.edges_begin(); eit != mesh_.edges_end(); eit++) {
-		mesh_.property(enewpoint_, eit.handle()) = getEdgeNewPoint(eit.handle());
+		mesh_.property(enewpoint_, eit.handle()) = getEdgeNewCatmullClarkPoint(eit.handle());
 	}
 	for (Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); vit++) {
 		mesh_.set_point(vit.handle(), getCatmullClarkOrigVertexNewLocation( vit.handle() ));
@@ -72,8 +72,8 @@ void SubdivisionViewer::Perform_CatmullClark()
 	mesh_.remove_property(fcentroid_);
 	mesh_.remove_property(enewpoint_);
 	mesh_.remove_property(enewvertex_);
-	mesh_.update_normals();
 	update_face_indices();
+	mesh_.update_normals();
 	std::cerr << mesh_.n_vertices() << " vertices, " << mesh_.n_faces() << " faces\n";
 }
 
@@ -87,26 +87,139 @@ void SubdivisionViewer::Perform_Loop()
 	2. Allocate new edge vertices in enewvertex_
 	3. Delete the old faces, and enter the new faces
 	**********************************************/
+
+	triTesselation();
+
+	for (Mesh::EdgeIter eit = mesh_.edges_begin(); eit != mesh_.edges_end(); eit++) {
+		mesh_.property(enewpoint_, eit.handle()) = getEdgeNewLoopPoint(eit.handle());
+	}
+	for (Mesh::VertexIter vit = mesh_.vertices_begin(); vit != mesh_.vertices_end(); vit++) {
+		mesh_.set_point(vit.handle(), getLoopOrigVertexNewLocation( vit.handle() ));
+	}
+	// Allocating vertices for new edge points. Face vertex is allocated in addNewCatmullClarkConnectivity
+	// New faces are created and old faces are deleted in addNewCatmullClarkConnectivity
+	for (Mesh::EdgeIter eit = mesh_.edges_begin(); eit != mesh_.edges_end(); eit++) {
+		mesh_.property(enewvertex_, eit.handle()) = mesh_.add_vertex( mesh_.property(enewpoint_, eit.handle()) );
+		assert( mesh_.is_valid_handle( mesh_.property(enewvertex_, eit.handle()) ) );
+	}
+	std::vector<Mesh::FaceHandle> oldFaces;
+	for(Mesh::FaceIter fit = mesh_.faces_begin(); fit != mesh_.faces_end(); fit++) {
+		oldFaces.push_back(fit.handle());
+	}
+	for (int i = 0; i < oldFaces.size(); i++) {
+		addNewLoopConnectivity( oldFaces[i] );
+	}
+
+	mesh_.garbage_collection();
 	mesh_.remove_property(enewpoint_);
 	mesh_.remove_property(enewvertex_);
-	mesh_.update_normals();
 	update_face_indices();
+	mesh_.update_normals();
 	std::cerr << mesh_.n_vertices() << " vertices, " << mesh_.n_faces() << " faces\n";
 }
 
-// Helpers
-Mesh::Point SubdivisionViewer::getFaceCentroid(Mesh::FaceHandle fh)
+// Loop
+Mesh::Point SubdivisionViewer::getLoopOrigVertexNewLocation(Mesh::VertexHandle vh)
 {
-	Mesh::Point sum(0,0,0);
-	int count = 0;
-	for(Mesh::FaceVertexIter vit = mesh_.fv_begin(fh); vit != mesh_.fv_end(fh); vit++) {
-		sum += mesh_.point(vit.handle());
-		count++;
+	if (mesh_.is_boundary(vh)) {
+		return getLoopBoundaryVertexNewLocation(vh);
 	}
+	else {
+		return getLoopInternalVertexNewLocation(vh);
+	}
+}
+
+Mesh::Point SubdivisionViewer::getLoopBoundaryVertexNewLocation(Mesh::VertexHandle vh)
+{
+	Mesh::Point		P		=	mesh_.point(vh);
+	Mesh::Point		sum		=	(P * 6);
+	int				count	=	8;
+	for (Mesh::VertexOHalfedgeIter heit = mesh_.voh_begin(vh); heit != mesh_.voh_end(vh); heit++) {
+		EdgeHandle eh = mesh_.edge_handle(heit.handle());
+		if ( mesh_.is_boundary(eh) ) {
+			VertexHandle v = mesh_.to_vertex_handle(heit.handle());
+			sum += (mesh_.point(v) * 1);
+		}
+	}
+	return (sum / count);
+}
+
+Mesh::Point SubdivisionViewer::getLoopInternalVertexNewLocation(Mesh::VertexHandle vh)
+{
+	Mesh::Point		P		=	mesh_.point(vh);
+	double			betha	=	loopBetha(vh);
+	Mesh::Point		sum		=	Mesh::Point(0,0,0);
+	int				k		=	0;
+	for (Mesh::VertexVertexIter vit = mesh_.vv_begin(vh); vit != mesh_.vv_end(vh); vit++) {
+		sum += (mesh_.point(vit.handle()) * betha);
+		k++;
+	}
+	sum += P * (1 - (k*betha));
+	/*cout << "Old: ( "<< P[0] << "," << P[1] << "," << P[2] <<") ";
+	cout << "New: ( "<< sum[0] << "," << sum[1] << "," << sum[2] <<") ";
+	cout << endl;*/
+	return sum;
+}
+
+Mesh::Point SubdivisionViewer::getEdgeNewLoopPoint(Mesh::EdgeHandle eh)
+{
+	if (mesh_.is_boundary(eh)) {
+		return getEdgeMidpoint(eh); // we want new point to remain on boundary
+	}
+	int count = 8;
+	Mesh::Point sum(0,0,0);
+	HalfedgeHandle he	= mesh_.halfedge_handle(eh, 0);
+	HalfedgeHandle ohe	= mesh_.opposite_halfedge_handle(he);
+	sum += (mesh_.point( mesh_.from_vertex_handle(he) ) * 3);
+	sum += (mesh_.point( mesh_.to_vertex_handle(he) ) * 3);
+
+	HalfedgeHandle nhe	= mesh_.next_halfedge_handle(he);
+	HalfedgeHandle onhe	= mesh_.next_halfedge_handle(ohe);
+	sum += (mesh_.point( mesh_.to_vertex_handle(nhe) ) * 1);
+	sum += (mesh_.point( mesh_.to_vertex_handle(onhe) ) * 1);
 	return sum / count;
 }
 
-Mesh::Point SubdivisionViewer::getEdgeNewPoint(Mesh::EdgeHandle eh)
+double SubdivisionViewer::loopBetha(Mesh::VertexHandle vh)
+{
+	// 5/8 = 0.625, 3/8 = 0.375, 1/4 = 0.25
+	int			n			=	getVertexValence(vh);
+	double		nInv		=	1.0/((double)n);
+	double		_cos		=	cos( 2 * nInv * M_PI );
+	double		toSquare	=	(0.375) + ((0.25) * _cos);
+	double		betha		=	nInv * ( (0.625) - (toSquare*toSquare) );
+	return betha;
+}
+
+void SubdivisionViewer::addNewLoopConnectivity(Mesh::FaceHandle fh)
+{
+	Mesh::HalfedgeHandle			firstHe		=	mesh_.halfedge_handle(fh);
+	Mesh::HalfedgeHandle			he			=	firstHe;
+	std::vector<TriFaceCorners>		facesToAdd;
+	std::vector<Mesh::VertexHandle>	newVertices;
+	do {
+		Mesh::HalfedgeHandle	prevHe	=	mesh_.prev_halfedge_handle(he);	
+		Mesh::EdgeHandle		e		=	mesh_.edge_handle(he);
+		Mesh::EdgeHandle		prevE	=	mesh_.edge_handle(prevHe);
+		Mesh::VertexHandle		v		=	mesh_.from_vertex_handle(he);
+		Mesh::VertexHandle		eV		=	mesh_.property(enewvertex_ ,e);
+		Mesh::VertexHandle		prevEV	=	mesh_.property(enewvertex_ ,prevE);
+		facesToAdd.push_back( TriFaceCorners(v, eV, prevEV) );
+		newVertices.push_back(eV);
+
+		he = mesh_.next_halfedge_handle(he);
+	} while (he != firstHe);
+	// Now we can delete the old face
+	mesh_.delete_face(fh);
+	// Now we can add the new faces
+	mesh_.add_face(newVertices);
+	for (int i = 0; i < facesToAdd.size(); i++) {
+		mesh_.add_face(facesToAdd[i].v0, facesToAdd[i].v1, facesToAdd[i].v2);
+	}
+}
+
+// Catmull clark
+Mesh::Point SubdivisionViewer::getEdgeNewCatmullClarkPoint(Mesh::EdgeHandle eh)
 {
 	if (mesh_.is_boundary(eh)) {
 		return getEdgeMidpoint(eh); // we want new point to remain on boundary
@@ -123,17 +236,6 @@ Mesh::Point SubdivisionViewer::getEdgeNewPoint(Mesh::EdgeHandle eh)
 	if (!mesh_.is_boundary(ohe)) {
 		sum += mesh_.property(fcentroid_, mesh_.face_handle(ohe));
 	}
-	return sum / count;
-}
-
-Mesh::Point SubdivisionViewer::getEdgeMidpoint(Mesh::EdgeHandle eh)
-{
-	int count = 2;
-	Mesh::Point sum(0,0,0);
-	HalfedgeHandle he	= mesh_.halfedge_handle(eh, 0);
-	HalfedgeHandle ohe	= mesh_.opposite_halfedge_handle(he);
-	sum += mesh_.point( mesh_.from_vertex_handle(he) );
-	sum += mesh_.point( mesh_.to_vertex_handle(he) );
 	return sum / count;
 }
 
@@ -181,6 +283,29 @@ void SubdivisionViewer::addNewCatmullClarkConnectivity(Mesh::FaceHandle fh)
 	}
 }
 
+// Helpers
+Mesh::Point SubdivisionViewer::getFaceCentroid(Mesh::FaceHandle fh)
+{
+	Mesh::Point sum(0,0,0);
+	int count = 0;
+	for(Mesh::FaceVertexIter vit = mesh_.fv_begin(fh); vit != mesh_.fv_end(fh); vit++) {
+		sum += mesh_.point(vit.handle());
+		count++;
+	}
+	return sum / count;
+}
+
+Mesh::Point SubdivisionViewer::getEdgeMidpoint(Mesh::EdgeHandle eh)
+{
+	int count = 2;
+	Mesh::Point sum(0,0,0);
+	HalfedgeHandle he	= mesh_.halfedge_handle(eh, 0);
+	HalfedgeHandle ohe	= mesh_.opposite_halfedge_handle(he);
+	sum += mesh_.point( mesh_.from_vertex_handle(he) );
+	sum += mesh_.point( mesh_.to_vertex_handle(he) );
+	return sum / count;
+}
+
 Mesh::Point	SubdivisionViewer::getIncidentFacesAverageMidpoint(Mesh::VertexHandle vh)
 {
 	Mesh::Point sum(0,0,0);
@@ -224,6 +349,63 @@ int SubdivisionViewer::getVertexValence(Mesh::VertexHandle vh)
 	}
 	return count;
 }
+
+int SubdivisionViewer::getNumOfFaceVertices(Mesh::FaceHandle fh)
+{
+	int count = 0;
+	for(Mesh::FaceVertexIter vit = mesh_.fv_begin(fh); vit != mesh_.fv_end(fh); vit++) {
+		count++;
+	}
+	return count;
+}
+
+// Tesselation
+void SubdivisionViewer::triTesselation()
+{
+	std::vector<FaceHandle>	badFaces;
+	for(Mesh::FaceIter fit = mesh_.faces_begin(); fit != mesh_.faces_end(); fit++) {
+		if (3 != getNumOfFaceVertices(fit.handle())) {
+			badFaces.push_back(fit.handle());
+		}
+	}
+	if (badFaces.size() == 0) {
+		return;
+	}
+	for(int i = 0; i < badFaces.size(); i++) {
+		if (mesh_.is_boundary(badFaces[i])) {
+			bool ok = false;
+			cout << "Hole: ";
+		}
+		faceTriTesselation(badFaces[i]);
+	}
+	mesh_.garbage_collection();
+	update_face_indices();
+	mesh_.update_normals();
+}
+
+void SubdivisionViewer::faceTriTesselation(Mesh::FaceHandle fh)
+{
+	Mesh::Point						facePoint	=	getFaceCentroid(fh);
+	Mesh::VertexHandle				faceVertex	=	mesh_.add_vertex(facePoint);
+	Mesh::HalfedgeHandle			firstHe		=	mesh_.halfedge_handle(fh);
+	Mesh::HalfedgeHandle			he			=	firstHe;
+	std::vector<TriFaceCorners>		facesToAdd;
+	do {
+		Mesh::VertexHandle		v0		=	mesh_.to_vertex_handle(he);
+		Mesh::VertexHandle		v2		=	mesh_.from_vertex_handle(he);
+		facesToAdd.push_back( TriFaceCorners(v0, faceVertex, v2) );
+
+		he = mesh_.next_halfedge_handle(he);
+	} while (he != firstHe);
+	// Now we can delete the old face
+	mesh_.delete_face(fh);
+	// Now we can add the new faces
+	for (int i = 0; i < facesToAdd.size(); i++) {
+		mesh_.add_face(facesToAdd[i].v0, facesToAdd[i].v1, facesToAdd[i].v2);
+	}
+	cout << facesToAdd.size() << endl;
+}
+
 
 // Common
 bool SubdivisionViewer::open_mesh(const char* _meshfilename)

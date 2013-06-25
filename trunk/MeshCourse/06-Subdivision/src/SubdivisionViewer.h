@@ -21,7 +21,7 @@ private:
 	
 
 	Mesh::Point													getFaceCentroid(Mesh::FaceHandle fh);
-	Mesh::Point													getEdgeNewPoint(Mesh::EdgeHandle eh);
+	Mesh::Point													getEdgeNewCatmullClarkPoint(Mesh::EdgeHandle eh);
 	Mesh::Point													getCatmullClarkOrigVertexNewLocation(Mesh::VertexHandle vh);
 	void														addNewCatmullClarkConnectivity(Mesh::FaceHandle fh);
 	Mesh::Point													getIncidentFacesAverageMidpoint(Mesh::VertexHandle vh);
@@ -29,6 +29,15 @@ private:
 	Mesh::Point													getIncidentBoundaryEdgesAverageMidpoint(Mesh::VertexHandle vh);
 	Mesh::Point													getEdgeMidpoint(Mesh::EdgeHandle eh);
 	int															getVertexValence(Mesh::VertexHandle vh);
+	void														triTesselation();
+	void														faceTriTesselation(Mesh::FaceHandle fh);
+	int															getNumOfFaceVertices(Mesh::FaceHandle fh);
+	double														loopBetha(Mesh::VertexHandle vh);
+	Mesh::Point													getEdgeNewLoopPoint(Mesh::EdgeHandle eh);
+	Mesh::Point													getLoopOrigVertexNewLocation(Mesh::VertexHandle vh);
+	Mesh::Point													getLoopBoundaryVertexNewLocation(Mesh::VertexHandle vh);
+	Mesh::Point													getLoopInternalVertexNewLocation(Mesh::VertexHandle vh);
+	void														addNewLoopConnectivity(Mesh::FaceHandle fh);
 
 	OpenMesh::VPropHandleT<Mesh::Point>							vpos_;
 	OpenMesh::FPropHandleT<Mesh::Point>							fcentroid_;
@@ -51,6 +60,19 @@ private:
 			v3(_v3)
 		{}
 	};
+	struct TriFaceCorners
+	{
+		Mesh::VertexHandle v0;
+		Mesh::VertexHandle v1;
+		Mesh::VertexHandle v2;
+
+		TriFaceCorners(Mesh::VertexHandle _v0, Mesh::VertexHandle _v1, Mesh::VertexHandle _v2) :
+			v0(_v0),
+			v1(_v1),
+			v2(_v2)
+		{}
+	};
+
 
 };
 

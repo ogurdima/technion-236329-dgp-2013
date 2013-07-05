@@ -77,7 +77,6 @@ void SubdivisionViewer::Perform_CatmullClark()
 	std::cerr << mesh_.n_vertices() << " vertices, " << mesh_.n_faces() << " faces\n";
 }
 
-
 void SubdivisionViewer::Perform_Loop()
 {
 	mesh_.add_property(enewpoint_);
@@ -372,10 +371,6 @@ void SubdivisionViewer::triTesselation()
 		return;
 	}
 	for(int i = 0; i < badFaces.size(); i++) {
-		if (mesh_.is_boundary(badFaces[i])) {
-			bool ok = false;
-			cout << "Hole: ";
-		}
 		faceTriTesselation(badFaces[i]);
 	}
 	mesh_.garbage_collection();
@@ -403,7 +398,6 @@ void SubdivisionViewer::faceTriTesselation(Mesh::FaceHandle fh)
 	for (int i = 0; i < facesToAdd.size(); i++) {
 		mesh_.add_face(facesToAdd[i].v0, facesToAdd[i].v1, facesToAdd[i].v2);
 	}
-	cout << facesToAdd.size() << endl;
 }
 
 
